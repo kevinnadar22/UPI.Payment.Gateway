@@ -1,0 +1,38 @@
+{
+  "name": "UPI Transaction Gateway",
+  "description": "A simple api to track UPI transactions",
+  "keywords": [
+    "upi",
+    "transaction",
+    "gateway",
+    "gpay",
+    "phonepe",
+    "paytm"
+  ],
+  "website": "",
+  "repository": "",
+  "env": {
+    "DATABASE_NAME": {
+      "description": "Name of the database",
+      "value": "upi_transaction",
+      "required": false
+    },
+    "DATABASE_URL": {
+      "description": "Your database URI from mongodb.com",
+      "value": "",
+      "required": true
+    }
+  },
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "Eco"
+    }
+  }
+}
