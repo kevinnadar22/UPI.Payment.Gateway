@@ -1,3 +1,4 @@
+import traceback
 from flask import Flask, request, jsonify
 import re
 from pymongo import MongoClient
@@ -29,7 +30,12 @@ def index():
 def parse_transaction():
     """Parses the transaction message and stores it in the database."""
     try:
-        message = request.json.get("message", "")
+        if request.content_type == "application/json":
+            message = request.json.get("message", "")
+        elif "application/x-www-form-urlencoded" in request.content_type:
+            message = request.form.get("message", "")
+        else:
+            return jsonify({"error": "Invalid content type"}), 400
 
         # Extract transaction details
         amount_match = amount_pattern.search(message)
@@ -43,7 +49,7 @@ def parse_transaction():
 
         # Clean extracted values
         amount = float(amount_match.group(0).replace(",", "").replace(" ", ""))
-        upi_ref = upi_ref_match.group(1)
+        upi_ref = int(upi_ref_match.group(1))
         upi_id = upi_id_match.group(0) if upi_id_match else None
 
         # Check if transaction already exists
@@ -60,13 +66,14 @@ def parse_transaction():
             "message": message,
             "timestamp": datetime.now(),
         }
-
+        print(transaction)
         # Insert transaction into MongoDB
         collection.insert_one(transaction)
 
         return jsonify({"message": "Transaction recorded successfully"}), 201
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 
@@ -77,7 +84,7 @@ def get_transaction(upi_ref):
         transaction = db.transactions.find_one({"upi_ref": upi_ref})
         if not transaction:
             return jsonify({"error": "Transaction not found"}), 404
-
+        transaction.pop("_id")
         return jsonify(transaction), 200
 
     except Exception as e:
@@ -100,6 +107,10 @@ def get_all_transactions():
 
         # Get total transaction count
         total_transactions = collection.count_documents({})
+
+        # Remove MongoDB ObjectID from response
+        for transaction in transactions:
+            transaction.pop("_id")
 
         # Prepare paginated response
         response = {
