@@ -1,16 +1,18 @@
 {
   "name": "UPI Transaction Gateway",
-  "description": "A simple api to track UPI transactions",
+  "description": "A simple API to track UPI transactions",
   "keywords": [
     "upi",
     "transaction",
     "gateway",
     "gpay",
     "phonepe",
-    "paytm"
+    "paytm",
+    "upi payment",
+    "upi transaction"
   ],
-  "website": "",
-  "repository": "",
+  "website": "https://github.com/kevinnadar22/UPI.Payment.Gateway",
+  "repository": "https://github.com/kevinnadar22/UPI.Payment.Gateway",
   "env": {
     "DATABASE_NAME": {
       "description": "Name of the database",

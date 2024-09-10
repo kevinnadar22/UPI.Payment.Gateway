@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from datetime import datetime
 from config import Config, TransactionType
 
+# Initialize Flask app
 app = Flask(__name__)
 
 # MongoDB setup
@@ -13,24 +14,24 @@ collection = db["transactions"]
 
 # Regex patterns
 amount_pattern = re.compile(r"(\d{1,3}(,\d{3})*|\d+)(\.\d{2})?")
-# 12 digit number pattern
-upi_ref_pattern = re.compile(r"(\d{12})")
+upi_ref_pattern = re.compile(r"(\d{12})")  # 12 digit UPI reference pattern
+upi_id_pattern = re.compile(r"[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}")  # UPI ID pattern
 credited_pattern = re.compile(rf"{TransactionType.CREDITED.value}")
 debited_pattern = re.compile(rf"{TransactionType.DEBITED.value}")
-upi_id_pattern = re.compile(r"[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}")
 
 
 @app.route("/")
 def index():
-    return jsonify({"message": "ok"})
+    return jsonify({"message": "ok"}), 200
 
 
 @app.route("/transaction", methods=["POST"])
 def parse_transaction():
+    """Parses the transaction message and stores it in the database."""
     try:
         message = request.json.get("message", "")
 
-        # Extracting details
+        # Extract transaction details
         amount_match = amount_pattern.search(message)
         upi_ref_match = upi_ref_pattern.search(message)
         credited_match = credited_pattern.search(message)
@@ -40,27 +41,27 @@ def parse_transaction():
         if not (amount_match and upi_ref_match and (credited_match or debited_match)):
             return jsonify({"error": "Invalid message format"}), 400
 
+        # Clean extracted values
         amount = float(amount_match.group(0).replace(",", "").replace(" ", ""))
         upi_ref = upi_ref_match.group(1)
-        transaction_type = "credited" if credited_match else "debited"
-        if upi_id_match:
-            upi_id = upi_id_match.group(0)
-        else:
-            upi_id = None
+        upi_id = upi_id_match.group(0) if upi_id_match else None
 
+        # Check if transaction already exists
         if db.transactions.find_one({"upi_ref": upi_ref}):
             return jsonify({"error": "Transaction already recorded"}), 400
 
+        # Create transaction record
         transaction = {
             "amount": amount,
             "upi_ref": upi_ref,
             "upi_id": upi_id,
-            "transaction_type": transaction_type,
-            "timestamp": datetime.now(),
+            "credited": bool(credited_match),
+            "debited": bool(debited_match),
             "message": message,
+            "timestamp": datetime.now(),
         }
 
-        # Inserting into MongoDB
+        # Insert transaction into MongoDB
         collection.insert_one(transaction)
 
         return jsonify({"message": "Transaction recorded successfully"}), 201
@@ -69,5 +70,51 @@ def parse_transaction():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/transaction/<upi_ref>", methods=["GET"])
+def get_transaction(upi_ref):
+    """Fetches a transaction by UPI reference number."""
+    try:
+        transaction = db.transactions.find_one({"upi_ref": upi_ref})
+        if not transaction:
+            return jsonify({"error": "Transaction not found"}), 404
+
+        return jsonify(transaction), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/transaction", methods=["GET"])
+def get_all_transactions():
+    """Fetches all transactions with pagination support."""
+    try:
+        # Pagination query parameters
+        page = int(request.args.get("page", 1))  # Default page = 1
+        per_page = int(request.args.get("per_page", 10))  # Default per page = 10
+
+        # Calculate offset for pagination
+        skip = (page - 1) * per_page
+
+        # Fetch transactions with pagination
+        transactions = list(collection.find().skip(skip).limit(per_page))
+
+        # Get total transaction count
+        total_transactions = collection.count_documents({})
+
+        # Prepare paginated response
+        response = {
+            "transactions": transactions,
+            "page": page,
+            "per_page": per_page,
+            "total_transactions": total_transactions,
+            "total_pages": (total_transactions + per_page - 1) // per_page,
+        }
+
+        return jsonify(response), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
-    app.run(debug=True, host=Config.HOST, port=Config.PORT)
+    app.run(debug=Config.DEBUG, host=Config.HOST, port=Config.PORT)

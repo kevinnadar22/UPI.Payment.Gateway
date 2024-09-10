@@ -11,10 +11,14 @@ else:
 
 
 class Config(object):
-    HOST = "0.0.0.0"
-    PORT = int(os.getenv("PORT", 5000))
+    # Mandatory configurations
     DATABASE_URL = os.getenv("DATABASE_URL")
+
+    # Optional configurations
     DATABASE_NAME = os.getenv("DATABASE_NAME", "upi_transactions")
+    HOST = os.environ.get("HOST", "0.0.0.0")
+    PORT = int(os.getenv("PORT", 5000))
+    DEBUG = os.getenv("DEBUG", False)
 
 
 class TransactionType(Enum):

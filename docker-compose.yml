@@ -1,9 +1,15 @@
-version: '3.8'
-
 services:
   web:
     build: .
     container_name: flask_app
     ports:
-      - "${PORT}:5000"
+      - "${PORT:-8000}:8000"  # Defaults to 8000 if PORT is not specified
     env_file: ".env"
+    restart: always  # Ensures the container restarts automatically on failure
+    environment:
+      - FLASK_ENV=production  # Ensure Flask runs in production mode
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"  # Rotate logs when they exceed 10MB
+        max-file: "3"    # Keep the latest 3 log files
