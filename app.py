@@ -17,8 +17,7 @@ collection = db["transactions"]
 amount_pattern = re.compile(r"(\d{1,3}(,\d{3})*|\d+)(\.\d{2})?")
 upi_ref_pattern = re.compile(r"(\d{12})")  # 12 digit UPI reference pattern
 upi_id_pattern = re.compile(r"[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}")  # UPI ID pattern
-credited_pattern = re.compile(rf"{TransactionType.CREDITED.value}")
-debited_pattern = re.compile(rf"{TransactionType.DEBITED.value}")
+transaction_type_pattern = re.compile(r"credited|debited", re.IGNORECASE)
 
 
 @app.route("/")
@@ -40,8 +39,9 @@ def parse_transaction():
         # Extract transaction details
         amount_match = amount_pattern.search(message)
         upi_ref_match = upi_ref_pattern.search(message)
-        credited_match = credited_pattern.search(message)
-        debited_match = debited_pattern.search(message)
+        transaction_type_match = transaction_type_pattern.search(message)
+        credited_match = transaction_type_match.group(0).lower() == TransactionType.CREDITED
+        debited_match = transaction_type_match.group(0).lower() == TransactionType.DEBITED
         upi_id_match = upi_id_pattern.search(message)
 
         if not (amount_match and upi_ref_match and (credited_match or debited_match)):
@@ -66,7 +66,6 @@ def parse_transaction():
             "message": message,
             "timestamp": datetime.now(),
         }
-        print(transaction)
         # Insert transaction into MongoDB
         collection.insert_one(transaction)
 
