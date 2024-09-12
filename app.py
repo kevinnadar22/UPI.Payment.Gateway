@@ -39,9 +39,10 @@ def parse_transaction():
         # Extract transaction details
         amount_match = amount_pattern.search(message)
         upi_ref_match = upi_ref_pattern.search(message)
-        transaction_type_match = transaction_type_pattern.search(message)
-        credited_match = transaction_type_match.group(0).lower() == TransactionType.CREDITED
-        debited_match = transaction_type_match.group(0).lower() == TransactionType.DEBITED
+        transaction_type_match = transaction_type_pattern.search(message).group(0).lower()
+
+        credited_match = transaction_type_match == TransactionType.CREDITED.value
+        debited_match = transaction_type_match == TransactionType.DEBITED.value
         upi_id_match = upi_id_pattern.search(message)
 
         if not (amount_match and upi_ref_match and (credited_match or debited_match)):
@@ -61,8 +62,8 @@ def parse_transaction():
             "amount": amount,
             "upi_ref": upi_ref,
             "upi_id": upi_id,
-            "credited": bool(credited_match),
-            "debited": bool(debited_match),
+            "credited": credited_match,
+            "debited": debited_match,
             "message": message,
             "timestamp": datetime.now(),
         }
