@@ -14,7 +14,7 @@ db = client[Config.DATABASE_NAME]
 collection = db["transactions"]
 
 # Regex patterns
-amount_pattern = re.compile(r"(\d{1,3}(,\d{3})*|\d+)(\.\d{2})?")
+amount_pattern = re.compile(r"(\d{1,3}(,\d{3})*|\d+)\.\d{2}")
 upi_ref_pattern = re.compile(r"(\d{12})")  # 12 digit UPI reference pattern
 upi_id_pattern = re.compile(r"[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}")  # UPI ID pattern
 transaction_type_pattern = re.compile(r"credited|debited", re.IGNORECASE)
