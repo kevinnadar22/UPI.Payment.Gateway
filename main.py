@@ -104,22 +104,26 @@ with tab2:
     uploaded_file = st.file_uploader(
         "Upload payment screenshot", type=["png", "jpg", "jpeg"]
     )
+    utr_id = st.text_input("Enter UPI Reference")
 
-    if uploaded_file:
-        st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
-        image_path = f"uploaded_{uploaded_file.name}"
-        with open(image_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
+    if uploaded_file or utr_id:
 
-        utr_id = get_utr_id_from_image(image_path)
+        if uploaded_file:
+            st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
+            image_path = f"uploaded_{uploaded_file.name}"
+            with open(image_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+
+            utr_id = get_utr_id_from_image(image_path)
+        else:
+            utr_id = utr_id.split(",")
 
         for utr in utr_id:
             json_data = get_transaction(utr)
             if "error" not in json_data:
                 break
 
-        if utr_id and "error" not in json_data:
-            st.write(f"UPI Reference: {utr_id}")
+        if "error" not in json_data:
             st.data_editor(json_data)
         elif json_data.get("error"):
             st.error(f"Error: {json_data['error']}")
