@@ -15,7 +15,7 @@
     ·
     <a href="https://www.telegram.dog/ask_admin001">Report Bug</a>
     ·
-    <a href="https://github.com/kevinnadar22/UPI.Payment.Gateway#key-features">Features</a>
+    <a href="#key-features">Features</a>
     ·
     <a href="#deploy">Deploy</a>
     ·
