@@ -82,8 +82,7 @@ You can deploy this bot anywhere. Below are some recommended options:
 |                                                        | Name                 | Deploy                                                                                                                                                                                                                             |
 | ------------------------------------------------------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [![Heroku](assets/heroku.png)](https://heroku.com) | Heroku               | [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/kevinnadar22/UPI.Payment.Gateway)                                                                                    |
-| ![Koyeb](assets/koyeb.png)                         | Koyeb                | [![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/services/deploy?type=git&builder=dockerfile&repository=github.com/kevinnadar22/UPI.Payment.Gateway&branch=main
-) |
+| ![Koyeb](assets/koyeb.png)                         | Koyeb                | [![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/services/deploy?type=git&builder=dockerfile&repository=github.com/kevinnadar22/UPI.Payment.Gateway&branch=main) |
                                                                                                                                                                                                   
 ### Stack Used
 
