@@ -13,10 +13,10 @@ def get_utr_id_from_image(image_path):
     try:
         img = Image.open(image_path)
         text = pytesseract.image_to_string(img)
-        match = re.search(r"\b\d(?:\s*\d){11}\b", text)
+        match = re.findall(r"\b\d(?:\s*\d){11}\b", text)
         if match:
             os.remove(image_path)
-            return match.group().strip()
+            return match
         else:
             return None
     except Exception as e:
@@ -68,6 +68,7 @@ def get_transactions(page, per_page):
 
 
 def get_transaction(upi_ref):
+    upi_ref = upi_ref.replace(" ", "").strip()
     url = f"{Config.SERVER_URL}/transaction/{upi_ref}"
     response = requests.get(url)
     if response.status_code == 200:
@@ -111,7 +112,12 @@ with tab2:
             f.write(uploaded_file.getbuffer())
 
         utr_id = get_utr_id_from_image(image_path)
-        json_data = get_transaction(utr_id)
+
+        for utr in utr_id:
+            json_data = get_transaction(utr)
+            if "error" not in json_data:
+                break
+
         if utr_id and "error" not in json_data:
             st.write(f"UPI Reference: {utr_id}")
             st.data_editor(json_data)
