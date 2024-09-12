@@ -80,6 +80,9 @@ def parse_transaction():
 def get_transaction(upi_ref):
     """Fetches a transaction by UPI reference number."""
     try:
+        if not upi_ref.isdigit():
+            return jsonify({"error": "Invalid UPI Red"}), 400 
+        upi_ref = int(upi_ref)
         transaction = db.transactions.find_one({"upi_ref": upi_ref})
         if not transaction:
             return jsonify({"error": "Transaction not found"}), 404
