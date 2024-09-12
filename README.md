@@ -15,11 +15,11 @@
     ·
     <a href="https://www.telegram.dog/ask_admin001">Report Bug</a>
     ·
-    <a href="https://github.com/kevinnadar22/UPI.Payment.Gateway#features">Features</a>
+    <a href="https://github.com/kevinnadar22/UPI.Payment.Gateway#key-features">Features</a>
     ·
-    <a href="https://github.com/kevinnadar22/UPI.Payment.Gateway#deploy">Deploy</a>
+    <a href="#deploy">Deploy</a>
     ·
-    <a href="https://github.com/kevinnadar22/UPI.Payment.Gateway#required-variables">Variables</a>
+    <a href="#required-variables">Variables</a>
   </p>
 </div>
 
