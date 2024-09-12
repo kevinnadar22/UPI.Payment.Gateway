@@ -24,4 +24,4 @@ ENV PORT=8000
 EXPOSE $PORT
 
 # Use gunicorn as the production server
-CMD ["gunicorn", "-b", "0.0.0.0:${PORT}", "app:app", "--workers=4", "--threads=2", "--timeout=120", "--log-level=info"]
+CMD ["/bin/bash", "-c", "gunicorn -b 0.0.0.0:${PORT} app:app --workers=4 --threads=2 --timeout=120 --log-level=info"]
