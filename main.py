@@ -114,7 +114,7 @@ with tab2:
         json_data = get_transaction(utr_id)
         if utr_id and "error" not in json_data:
             st.write(f"UPI Reference: {utr_id}")
-            st.write(json_data)
+            st.data_editor(json_data)
         elif json_data.get("error"):
             st.error(f"Error: {json_data['error']}")
         else:
@@ -134,8 +134,9 @@ with tab3:
             transactions = transactions_data.get("transactions", [])
             total_pages = transactions_data.get("total_pages", 1)
             st.write(f"Showing page {page} of {total_pages}")
-            for transaction in transactions:
-                st.write(transaction)
+            transactions.reverse()
+            st.data_editor(transactions)
+
         else:
             st.error(f"Error: {transactions_data['error']}")
 
