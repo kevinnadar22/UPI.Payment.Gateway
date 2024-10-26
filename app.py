@@ -17,8 +17,8 @@ collection = db["transactions"]
 amount_pattern = re.compile(r"(\d{1,3}(,\d{3})*|\d+)\.\d{2}")
 upi_ref_pattern = re.compile(r"(\d{12})")  # 12 digit UPI reference pattern
 upi_id_pattern = re.compile(r"[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}")  # UPI ID pattern
-transaction_type_pattern = re.compile(r"credited|debited", re.IGNORECASE)
-
+#transaction_type_pattern = re.compile(r"credited|debited", re.IGNORECASE)
+transaction_type_pattern = re.compile(fr"({'|'.join([t.value for t in TransactionType])})", re.IGNORECASE)
 
 @app.route("/")
 def index():
@@ -41,8 +41,8 @@ def parse_transaction():
         upi_ref_match = upi_ref_pattern.search(message)
         transaction_type_match = transaction_type_pattern.search(message).group(0).lower()
 
-        credited_match = transaction_type_match == TransactionType.CREDITED.value
-        debited_match = transaction_type_match == TransactionType.DEBITED.value
+        credited_match = transaction_type_match in [TransactionType.CREDITED.value, TransactionType.RECEIVED.value]
+        debited_match = transaction_type_match in [TransactionType.DEBITED.value, TransactionType.SENT.value]
         upi_id_match = upi_id_pattern.search(message)
 
         if not (amount_match and upi_ref_match and (credited_match or debited_match)):

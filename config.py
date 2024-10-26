@@ -24,3 +24,5 @@ class Config(object):
 class TransactionType(Enum):
     CREDITED = "credited"
     DEBITED = "debited"
+    SENT = "sent"
+    RECEIVED = "received"
